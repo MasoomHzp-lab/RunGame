@@ -127,7 +127,18 @@ public class UnityRestServer : MonoBehaviour
         {
             context.Response.AddHeader("Access-Control-Allow-Origin", "*");
             context.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-            context.Response.AddHeader("Access-Control-Allow-Headers", "Content-Type");
+            
+            // Allow all headers requested by the client, or use a wildcard approach
+            string requestedHeaders = context.Request.Headers["Access-Control-Request-Headers"];
+            if (!string.IsNullOrEmpty(requestedHeaders))
+            {
+                context.Response.AddHeader("Access-Control-Allow-Headers", requestedHeaders);
+            }
+            else
+            {
+                context.Response.AddHeader("Access-Control-Allow-Headers", "*");
+            }
+            
             context.Response.StatusCode = 200;
             context.Response.Close();
             return;
@@ -263,7 +274,7 @@ public class UnityRestServer : MonoBehaviour
                 {
                     request = JsonUtility.FromJson<RunHttpRequest>(body);
 
-                    // جلوگیری از تداخل نام متغیر با بخش GET
+                    // Prevent variable name conflict with GET section
                     if (TryReadFootSideFromJson(body, out short parsedSideFromBody))
                     {
                         request.hasFootSide = true;
@@ -292,8 +303,8 @@ public class UnityRestServer : MonoBehaviour
         }
 
         int time = GetInt(context.Request, "time", 500);
-        short power = (short)GetInt(context.Request, "power", 50);
-        short threshold = (short)GetInt(context.Request, "threshold", 40);
+        int power = GetInt(context.Request, "power", 50);
+        int threshold = GetInt(context.Request, "threshold", 40);
         string sideRaw = context.Request.QueryString["side"];
 
         bool hasSide = TryParseFootSide(sideRaw, out short parsedSide);
@@ -322,9 +333,9 @@ public class UnityRestServer : MonoBehaviour
         string message;
 
         if (request.hasFootSide)
-            ok = api.Run(request.timeMs, request.footPower, request.threshold, request.footSide, out message);
+            ok = api.Run(request.timeMs, (short)request.footPower, (short)request.threshold, (short)request.footSide, out message);
         else
-            ok = api.Run(request.timeMs, request.footPower, request.threshold, out message);
+            ok = api.Run(request.timeMs, (short)request.footPower, (short)request.threshold, out message);
 
         if (!ok)
             return ApiError("run-rejected", message);
@@ -451,6 +462,16 @@ public class UnityRestServer : MonoBehaviour
         context.Response.ContentEncoding = Encoding.UTF8;
         context.Response.ContentLength64 = buffer.Length;
         context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+        
+        string requestedHeaders = context.Request.Headers["Access-Control-Request-Headers"];
+        if (!string.IsNullOrEmpty(requestedHeaders))
+        {
+            context.Response.AddHeader("Access-Control-Allow-Headers", requestedHeaders);
+        }
+        else
+        {
+            context.Response.AddHeader("Access-Control-Allow-Headers", "*");
+        }
 
         try
         {
@@ -491,10 +512,10 @@ public class UnityRestServer : MonoBehaviour
 public class RunHttpRequest
 {
     public int timeMs;
-    public short footPower;
-    public short threshold;
+    public int footPower;
+    public int threshold;
     public bool hasFootSide;
-    public short footSide;
+    public int footSide;
 }
 
 [Serializable]
