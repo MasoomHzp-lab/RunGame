@@ -372,13 +372,13 @@ public class UnityRestServer : MonoBehaviour
 
         raw = raw.Trim().ToLowerInvariant();
 
-        if (raw == "left" || raw == "l" || raw == "0")
+        if (raw == "left" || raw == "l" || raw == "0" || raw == "2")
         {
-            footSide = 0;
+            footSide = 2;
             return true;
         }
 
-        if (raw == "right" || raw == "r" || raw == "1" || raw == "2")
+        if (raw == "right" || raw == "r" || raw == "1")
         {
             footSide = 1;
             return true;

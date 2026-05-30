@@ -10,8 +10,40 @@ public class TherapyCommandAPI : MonoBehaviour
     [DllImport("user32.dll")]
     private static extern IntPtr GetActiveWindow();
 
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
     const int SW_HIDE = 0;
     const int SW_SHOW = 5;
+
+    private static IntPtr _mainWindowHandle = IntPtr.Zero;
+
+    private void Awake()
+    {
+        Application.runInBackground = true;
+#if UNITY_STANDALONE_WIN
+        if (_mainWindowHandle == IntPtr.Zero)
+        {
+            _mainWindowHandle = GetActiveWindow();
+            if (_mainWindowHandle == IntPtr.Zero)
+            {
+                _mainWindowHandle = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
+            }
+            if (_mainWindowHandle == IntPtr.Zero)
+            {
+                _mainWindowHandle = FindWindow(null, Application.productName);
+            }
+        }
+#endif
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+    }
 
     [Header("Step Timing")]
     [SerializeField] private bool inputTimeRepresentsFullGaitCycle = true;
@@ -25,6 +57,17 @@ public class TherapyCommandAPI : MonoBehaviour
     [SerializeField] private ProgressManager progressManager;
     [SerializeField] private UIManager uiManager;
     [SerializeField] private FeedbackManager feedbackManager;
+
+    private static bool _autoStartNextScene = false;
+
+    private void Start()
+    {
+        if (_autoStartNextScene)
+        {
+            _autoStartNextScene = false;
+            Invoke(nameof(StartSession), 0.5f); // Wait a bit to ensure GameManager initialized
+        }
+    }
 
     public void StartSession() => gameManager?.StartSession();
     public void PauseSession() => gameManager?.PauseSession();
@@ -113,8 +156,7 @@ public class TherapyCommandAPI : MonoBehaviour
     {
         // Hide window
 #if UNITY_STANDALONE_WIN
-        IntPtr hwnd = GetActiveWindow();
-        if (hwnd != IntPtr.Zero) ShowWindow(hwnd, SW_HIDE);
+        if (_mainWindowHandle != IntPtr.Zero) ShowWindow(_mainWindowHandle, SW_HIDE);
 #endif
 
         // Render قطع
@@ -147,19 +189,15 @@ public class TherapyCommandAPI : MonoBehaviour
     {
         // Show window
 #if UNITY_STANDALONE_WIN
-        IntPtr hwnd = GetActiveWindow();
-        if (hwnd == IntPtr.Zero)
-        {
-            // If GetActiveWindow fails because it's hidden, we might need to find it by name.
-            // But usually Unity maintains the active window handle.
-            // A better way is to use Process.GetCurrentProcess().MainWindowHandle, but let's try this first.
-            var process = System.Diagnostics.Process.GetCurrentProcess();
-            hwnd = process.MainWindowHandle;
-        }
-
-        if (hwnd != IntPtr.Zero) ShowWindow(hwnd, SW_SHOW);
+        if (_mainWindowHandle != IntPtr.Zero) ShowWindow(_mainWindowHandle, SW_SHOW);
 #endif
 
+        _autoStartNextScene = true;
+        Invoke(nameof(ReloadScene), 0.1f);
+    }
+
+    private void ReloadScene()
+    {
         // بازی کامل ریست میشه
         // Scene از اول لود میشه
         UnityEngine.SceneManagement.SceneManager.LoadScene(
