@@ -99,11 +99,15 @@ public class PlayerAnimationController : MonoBehaviour
         // Instead we force the walking state to start from a different phase.
         float phase = footSide == FootSide.Left ? leftFootStartPhase : rightFootStartPhase;
 
+        // Only force the animation phase if the character was previously idle.
+        // Forcing the phase on every step while already moving causes a visual snap/jump.
+        bool wasIdle = currentSpeedValue < 0.05f;
+
         currentSpeedValue = forcedWalkSpeedValue;
         animator.SetFloat(SpeedHash, forcedWalkSpeedValue);
         animator.speed = walkPlaybackSpeed;
 
-        if (!string.IsNullOrWhiteSpace(walkingStateName))
+        if (!string.IsNullOrWhiteSpace(walkingStateName) && wasIdle)
         {
             animator.Play(walkingStateName, 0, phase);
             animator.Update(0f);
