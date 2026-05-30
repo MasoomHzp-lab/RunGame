@@ -77,7 +77,7 @@ public class UIManager : MonoBehaviour
 
     public void UpdateIncomingStep(FootSide side, short power, short threshold)
     {
-        float percent = threshold > 0 ? Mathf.Clamp01((float)power / threshold) : 0f;
+        float percent = Mathf.Clamp01((float)power / 100f);
 
         if (side == FootSide.Left)
             footTelemetryUI?.SetLeftPercent(percent);
