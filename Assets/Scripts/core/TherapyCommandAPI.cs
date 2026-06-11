@@ -61,6 +61,45 @@ public class TherapyCommandAPI : MonoBehaviour
     private static bool _autoStartNextScene = false;
     private static bool _musicEnabled = true;
 
+    [Header("Power Settings")]
+    public int MinPower = 20;
+
+    private void OnGUI()
+    {
+        float width = 250;
+        float height = 60;
+        float x = Screen.width / 2f - width / 2f;
+        float y = Screen.height - height - 20;
+
+        GUIStyle boxStyle = new GUIStyle(GUI.skin.box);
+        boxStyle.fontSize = 16;
+        boxStyle.normal.textColor = Color.white;
+        boxStyle.alignment = TextAnchor.UpperCenter;
+        
+        GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+        buttonStyle.fontSize = 16;
+
+        GUILayout.BeginArea(new Rect(x, y, width, height), "Min Power", boxStyle);
+        GUILayout.Space(25);
+        GUILayout.BeginHorizontal();
+        
+        Color defaultColor = GUI.backgroundColor;
+
+        GUI.backgroundColor = MinPower == 20 ? Color.green : defaultColor;
+        if (GUILayout.Button("20%", buttonStyle)) MinPower = 20;
+        
+        GUI.backgroundColor = MinPower == 30 ? Color.green : defaultColor;
+        if (GUILayout.Button("30%", buttonStyle)) MinPower = 30;
+        
+        GUI.backgroundColor = MinPower == 50 ? Color.green : defaultColor;
+        if (GUILayout.Button("50%", buttonStyle)) MinPower = 50;
+        
+        GUI.backgroundColor = defaultColor;
+        
+        GUILayout.EndHorizontal();
+        GUILayout.EndArea();
+    }
+
     private void Start()
     {
         if (_autoStartNextScene)
@@ -273,6 +312,12 @@ public class TherapyCommandAPI : MonoBehaviour
         if (footPower < 0)
         {
             message = "invalid-foot-power";
+            return false;
+        }
+
+        if (footPower < MinPower)
+        {
+            message = $"power-below-min-power-({MinPower})";
             return false;
         }
 
