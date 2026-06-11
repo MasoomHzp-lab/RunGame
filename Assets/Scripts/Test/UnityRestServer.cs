@@ -314,6 +314,7 @@ public class UnityRestServer : MonoBehaviour
         int time = GetInt(context.Request, "time", 500);
         int power = GetInt(context.Request, "power", 50);
         int threshold = GetInt(context.Request, "threshold", 40);
+        int targetCoins = GetInt(context.Request, "targetCoins", 0);
         string sideRaw = context.Request.QueryString["side"];
 
         bool hasSide = TryParseFootSide(sideRaw, out short parsedSide);
@@ -324,7 +325,8 @@ public class UnityRestServer : MonoBehaviour
             footPower = power,
             threshold = threshold,
             hasFootSide = hasSide,
-            footSide = parsedSide
+            footSide = parsedSide,
+            targetCoins = targetCoins
         };
 
         DispatchToMainThread(context, () =>
@@ -342,7 +344,7 @@ public class UnityRestServer : MonoBehaviour
         string message;
 
         if (request.hasFootSide)
-            ok = api.Run(request.timeMs, (short)request.footPower, (short)request.threshold, (short)request.footSide, out message);
+            ok = api.Run(request.timeMs, (short)request.footPower, (short)request.threshold, (short)request.footSide, request.targetCoins, out message);
         else
             ok = api.Run(request.timeMs, (short)request.footPower, (short)request.threshold, out message);
 
@@ -534,6 +536,7 @@ public class RunHttpRequest
     public int threshold;
     public bool hasFootSide;
     public int footSide;
+    public int targetCoins;
 }
 
 [Serializable]

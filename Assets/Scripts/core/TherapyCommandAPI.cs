@@ -129,7 +129,7 @@ public class TherapyCommandAPI : MonoBehaviour
         return true;
     }
 
-    public bool Run(int timeMs, short footPower, short threshold, short footSide, out string message)
+    public bool Run(int timeMs, short footPower, short threshold, short footSide, int targetCoins, out string message)
     {
         FootSide side = ParseFootSide(footSide);
         if (side == FootSide.None)
@@ -138,7 +138,12 @@ public class TherapyCommandAPI : MonoBehaviour
             return false;
         }
 
-        return RunInternal(timeMs, footPower, threshold, side, out message);
+        return RunInternal(timeMs, footPower, threshold, side, targetCoins, out message);
+    }
+
+    public bool Run(int timeMs, short footPower, short threshold, short footSide, out string message)
+    {
+        return Run(timeMs, footPower, threshold, footSide, 0, out message);
     }
 
     public bool Run(int timeMs, short footPower, short threshold, out string message)
@@ -147,8 +152,11 @@ public class TherapyCommandAPI : MonoBehaviour
     return false;
 }
 
+    public void Run(int timeMs, short footPower, short threshold, short footSide, int targetCoins)
+        => Run(timeMs, footPower, threshold, footSide, targetCoins, out _);
+
     public void Run(int timeMs, short footPower, short threshold, short footSide)
-        => Run(timeMs, footPower, threshold, footSide, out _);
+        => Run(timeMs, footPower, threshold, footSide, 0, out _);
 
     public void Run(int timeMs, short footPower, short threshold)
         => Run(timeMs, footPower, threshold, out _);
@@ -248,7 +256,7 @@ public class TherapyCommandAPI : MonoBehaviour
     return FootSide.None;
 }
 
-    private bool RunInternal(int timeMs, short footPower, short threshold, FootSide side, out string message)
+    private bool RunInternal(int timeMs, short footPower, short threshold, FootSide side, int targetCoins, out string message)
     {
         if (timeMs <= 0)
         {
@@ -274,9 +282,14 @@ public class TherapyCommandAPI : MonoBehaviour
             return false;
         }
 
+        if (targetCoins > 0 && scoreManager != null)
+        {
+            scoreManager.SetTargetScore(targetCoins);
+        }
+
         int effectiveTimeMs = GetSingleStepDurationMs(timeMs);
 
-        Debug.Log($"[TherapyCommandAPI] Run accepted: rawSide mapped to {side}, inputTimeMs={timeMs}, effectiveStepMs={effectiveTimeMs}, power={footPower}, threshold={threshold}");
+        Debug.Log($"[TherapyCommandAPI] Run accepted: rawSide mapped to {side}, inputTimeMs={timeMs}, effectiveStepMs={effectiveTimeMs}, power={footPower}, threshold={threshold}, targetCoins={targetCoins}");
 
         StepCommand command = new StepCommand(effectiveTimeMs, footPower, threshold, side);
         runProcessor.EnqueueStep(command);
