@@ -59,6 +59,7 @@ public class TherapyCommandAPI : MonoBehaviour
     [SerializeField] private FeedbackManager feedbackManager;
 
     private static bool _autoStartNextScene = false;
+    private static bool _musicEnabled = true;
 
     private void Start()
     {
@@ -196,6 +197,12 @@ public class TherapyCommandAPI : MonoBehaviour
         Invoke(nameof(ReloadScene), 0.1f);
     }
 
+    public void SetMusic(bool enabled)
+    {
+        _musicEnabled = enabled;
+        AudioListener.volume = enabled ? 1f : 0f;
+    }
+
     private void ReloadScene()
     {
         // بازی کامل ریست میشه
@@ -207,9 +214,9 @@ public class TherapyCommandAPI : MonoBehaviour
         // تنظیمات به حالت اولیه برمی‌گردند
         Application.targetFrameRate = -1; // Default
 
-        // صدا برمی‌گرده
+        // صدا برمی‌گرده (با توجه به تنظیمات)
         AudioListener.pause = false;
-        AudioListener.volume = 1f;
+        AudioListener.volume = _musicEnabled ? 1f : 0f;
 
         // Physics فعال
         Physics.simulationMode = SimulationMode.FixedUpdate;

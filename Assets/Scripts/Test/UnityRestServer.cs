@@ -228,6 +228,15 @@ public class UnityRestServer : MonoBehaviour
                     });
                     return;
 
+                case "/music":
+                    bool musicEnabled = GetBool(context.Request, "enabled", true);
+                    DispatchToMainThread(context, () =>
+                    {
+                        api?.SetMusic(musicEnabled);
+                        return ApiOk("music", musicEnabled ? "music-enabled" : "music-disabled");
+                    });
+                    return;
+
                 case "/run":
                     HandleRunRequest(context);
                     return;
@@ -444,6 +453,15 @@ public class UnityRestServer : MonoBehaviour
     {
         string raw = request.QueryString[key];
         return int.TryParse(raw, out int value) ? value : defaultValue;
+    }
+
+    private bool GetBool(HttpListenerRequest request, string key, bool defaultValue)
+    {
+        string raw = request.QueryString[key];
+        if (bool.TryParse(raw, out bool value)) return value;
+        if (raw == "1") return true;
+        if (raw == "0") return false;
+        return defaultValue;
     }
 
     private string ReadBody(HttpListenerRequest request)
