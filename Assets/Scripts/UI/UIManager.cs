@@ -39,8 +39,8 @@ public class UIManager : MonoBehaviour
         if (scoreManager != null)
             scoreManager.OnScoreChanged += RefreshScore;
 
-        if (progressManager != null)
-            progressManager.OnProgressChanged += RefreshProgress;
+        // if (progressManager != null)
+        //     progressManager.OnProgressChanged += RefreshProgress;
 
         if (runProcessor != null)
             runProcessor.OnStepCompleted += HandleStepCompleted;
@@ -54,8 +54,8 @@ public class UIManager : MonoBehaviour
         if (scoreManager != null)
             scoreManager.OnScoreChanged -= RefreshScore;
 
-        if (progressManager != null)
-            progressManager.OnProgressChanged -= RefreshProgress;
+        // if (progressManager != null)
+        //     progressManager.OnProgressChanged -= RefreshProgress;
 
         if (runProcessor != null)
             runProcessor.OnStepCompleted -= HandleStepCompleted;
@@ -71,8 +71,8 @@ public class UIManager : MonoBehaviour
         if (scoreManager != null)
             RefreshScore(scoreManager.CurrentScore);
 
-        if (progressManager != null)
-            RefreshProgress(progressManager.CurrentProgress);
+        // if (progressManager != null)
+        //     RefreshProgress(progressManager.CurrentProgress);
     }
 
     public void UpdateIncomingStep(FootSide side, short power, short threshold)
@@ -87,14 +87,18 @@ public class UIManager : MonoBehaviour
         footTelemetryUI?.SetActiveFoot(side);
         if (activeFootText != null)
             activeFootText.text = side == FootSide.Left ? "Left Foot" : "Right Foot";
+
+        if (progressSlider != null)
+            progressSlider.value = percent;
     }
 
     public void HandleStepCompleted(StepResult result)
     {
         if (result == null) return;
 
-        if (messageText != null)
-            messageText.text = result.message;
+        // Message text is now handled exclusively by FeedbackManager to respect the isShowingImportantMessage flag
+        // if (messageText != null)
+        //     messageText.text = result.message;
     }
 
     public void RefreshScore(int score)

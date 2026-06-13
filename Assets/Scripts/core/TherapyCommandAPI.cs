@@ -315,15 +315,17 @@ public class TherapyCommandAPI : MonoBehaviour
             return false;
         }
 
-        if (footPower < MinPower)
-        {
-            message = $"power-below-min-power-({MinPower})";
-            return false;
-        }
-
         if (!CanAcceptRun(out string reason))
         {
             message = reason;
+            return false;
+        }
+
+        uiManager?.UpdateIncomingStep(side, footPower, threshold);
+
+        if (footPower < MinPower)
+        {
+            message = $"power-below-min-power-({MinPower})";
             return false;
         }
 
@@ -338,7 +340,6 @@ public class TherapyCommandAPI : MonoBehaviour
 
         StepCommand command = new StepCommand(effectiveTimeMs, footPower, threshold, side);
         runProcessor.EnqueueStep(command);
-        uiManager?.UpdateIncomingStep(side, footPower, threshold);
 
         message = "run-enqueued";
         return true;

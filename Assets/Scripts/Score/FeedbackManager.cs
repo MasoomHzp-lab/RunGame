@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -39,6 +40,9 @@ public class FeedbackManager : MonoBehaviour
             scoreManager.OnTargetReached -= HandleTargetReached;
     }
 
+    private Coroutine currentEffectRoutine;
+    private bool isShowingImportantMessage = false;
+
     private void HandleTargetReached()
     {
         if (audioSource != null && successClip != null)
@@ -57,10 +61,62 @@ public class FeedbackManager : MonoBehaviour
 
         if (messageText != null)
         {
-            messageText.text = "🎯 TARGET REACHED! 🎯";
-            messageText.color = Color.yellow;
-            // Optionally reset color later or keep it
+            if (currentEffectRoutine != null)
+                StopCoroutine(currentEffectRoutine);
+                
+            currentEffectRoutine = StartCoroutine(TargetReachedEffectRoutine());
         }
+    }
+
+    private IEnumerator TargetReachedEffectRoutine()
+    {
+        isShowingImportantMessage = true;
+        messageText.text = "Hoooray! The target is reached!";
+        messageText.color = new Color(1f, 0.84f, 0f); // Gold color
+        
+        Vector3 originalScale = Vector3.one;
+        
+        // Pulse effect
+        for (int i = 0; i < 4; i++)
+        {
+            float elapsed = 0f;
+            float duration = 0.4f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                float scale = Mathf.Lerp(1f, 1.6f, Mathf.Sin(t * Mathf.PI));
+                messageText.transform.localScale = originalScale * scale;
+                yield return null;
+            }
+        }
+        
+        messageText.transform.localScale = originalScale;
+        
+        // Wait a bit
+        yield return new WaitForSeconds(2f);
+        
+        // Fade out effect
+        float fadeElapsed = 0f;
+        float fadeDuration = 1f;
+        Color startColor = messageText.color;
+        
+        while (fadeElapsed < fadeDuration)
+        {
+            fadeElapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, fadeElapsed / fadeDuration);
+            messageText.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+            yield return null;
+        }
+        
+        // Clear message if it hasn't been changed by something else
+        if (messageText.text == "مأموریت انجام شد!")
+        {
+            messageText.text = string.Empty;
+        }
+        
+        isShowingImportantMessage = false;
+        currentEffectRoutine = null;
     }
 
     public void PlayStepFeedback(StepResult result)
@@ -100,15 +156,33 @@ public class FeedbackManager : MonoBehaviour
 
     private void SetMessage(string message)
     {
+        if (isShowingImportantMessage) return;
+
         if (messageText != null)
         {
+            if (currentEffectRoutine != null)
+            {
+                StopCoroutine(currentEffectRoutine);
+                currentEffectRoutine = null;
+            }
+            
             messageText.text = message;
             messageText.color = Color.white; // Reset to default color
+            messageText.transform.localScale = Vector3.one; // Reset scale
         }
     }
 
     public void ClearMessage()
     {
-        SetMessage(string.Empty);
+        isShowingImportantMessage = false;
+        if (currentEffectRoutine != null)
+        {
+            StopCoroutine(currentEffectRoutine);
+            currentEffectRoutine = null;
+        }
+        if (messageText != null)
+        {
+            messageText.text = string.Empty;
+        }
     }
 }

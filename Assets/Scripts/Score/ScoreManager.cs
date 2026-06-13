@@ -12,8 +12,16 @@ public class ScoreManager : MonoBehaviour
 
     public void SetTargetScore(int target)
     {
+        if (TargetScore == target) return;
+
         TargetScore = target;
         TargetReached = false;
+
+        if (TargetScore > 0 && !TargetReached && CurrentScore >= TargetScore)
+        {
+            TargetReached = true;
+            OnTargetReached?.Invoke();
+        }
     }
 
     public void AddScore(int amount)
