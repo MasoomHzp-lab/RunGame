@@ -38630,7 +38630,6 @@ MonoBehaviour:
   progressManager: {fileID: 1827743500}
   feedbackManager: {fileID: 1057787924}
   alternationManager: {fileID: 874763899}
-  scoringPolicy: {fileID: 1338113813}
 --- !u!1 &225648928
 GameObject:
   m_ObjectHideFlags: 0
@@ -105394,6 +105393,7 @@ MonoBehaviour:
   progressManager: {fileID: 1827743500}
   uiManager: {fileID: 593163187}
   feedbackManager: {fileID: 1057787924}
+  MinPower: 20
 --- !u!1 &616921791
 GameObject:
   m_ObjectHideFlags: 0
@@ -181553,6 +181553,7 @@ MonoBehaviour:
   failFxPrefab: {fileID: 0}
   fxAnchor: {fileID: 881440847}
   messageText: {fileID: 2133234920}
+  scoreManager: {fileID: 0}
 --- !u!82 &1057787925
 AudioSource:
   m_ObjectHideFlags: 0
@@ -335992,7 +335993,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMotor
   controller: {fileID: 1927388453}
-  walkSpeed: 1.6
+  walkSpeed: 1
   walkingAnimatorSpeed: 0.35
   acceleration: 3
   deceleration: 3.5
@@ -372723,7 +372724,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 78}
+  m_AnchoredPosition: {x: 0, y: 111}
   m_SizeDelta: {x: 300, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2133234920
