@@ -1,0 +1,2 @@
+Assets/Sprites/character.fbx filter=lfs diff=lfs merge=lfs -text
+Assets/Sprites/characterFemale.fbx filter=lfs diff=lfs merge=lfs -text

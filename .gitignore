@@ -40,6 +40,5 @@ crashlytics-build.properties
 .DS_Store
 Thumbs.db
 
-Assets/Sprites/character.fbx
-Assets/Sprites/characterFemale.fbx
+
 Assets/UI/character.zip
